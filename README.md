@@ -12,12 +12,12 @@ Install the standalone DynBox native CLI directly on your machine without clonin
 
 Using official one-liner installation:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/juwelzan/dynbox/master/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/juwelzan/dynbox/main/scripts/install.sh | sh
 ```
 
 Safer alternative (inspect before running):
 ```bash
-curl -fsSL https://raw.githubusercontent.com/juwelzan/dynbox/master/scripts/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/juwelzan/dynbox/main/scripts/install.sh -o install.sh
 cat install.sh # inspect the script
 sh install.sh
 ```
@@ -25,7 +25,7 @@ sh install.sh
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/juwelzan/dynbox/master/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/juwelzan/dynbox/main/scripts/install.ps1 | iex
 ```
 
 ### Installation Details & PATH Setup
@@ -43,6 +43,22 @@ irm https://raw.githubusercontent.com/juwelzan/dynbox/master/scripts/install.ps1
   dynbox setup
   dynbox doctor
   ```
+
+### Development / Source Installation
+
+If you are developing DynBox or installing from the Git repository:
+
+```bash
+# Clone the repository
+git clone https://github.com/juwelzan/dynbox.git
+cd dynbox/cli/dynbox
+
+# Activate globally from local source
+dart pub global activate --source path .
+
+# Ensure Dart pub-cache binaries are in your PATH (e.g., in ~/.zshrc)
+export PATH="$PATH:$HOME/.pub-cache/bin"
+```
 
 ---
 
