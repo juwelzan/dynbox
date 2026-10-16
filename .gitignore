@@ -6,7 +6,9 @@
 # Dart & Flutter
 .dart_tool/
 .packages
-build/
+/build/
+**/build/
+!**/lib/**/build/
 .pub/
 pubspec.lock
 
