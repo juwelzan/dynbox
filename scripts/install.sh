@@ -94,8 +94,37 @@ download_file() {
 
 MANIFEST_FILE="${TEMP_DIR}/release_manifest.json"
 if ! download_file "$MANIFEST_URL" "$MANIFEST_FILE"; then
+  echo "⚠️  Note: Precompiled binary release not found at $MANIFEST_URL"
+  echo "Attempting to install DynBox directly using Dart toolchain..."
+  echo ""
+
+  if command -v dart >/dev/null 2>&1; then
+    echo "Found Dart SDK: $(dart --version 2>&1 | head -n1)"
+    echo "Activating DynBox from official repository..."
+    if dart pub global activate --source git https://github.com/juwelzan/dynbox.git --git-path cli/dynbox; then
+      echo ""
+      echo "=========================================================="
+      echo "🎉 DynBox was successfully installed via Dart Pub!"
+      echo "=========================================================="
+      echo ""
+      echo "Ensure Dart pub-cache bin directory is in your PATH:"
+      echo "  export PATH=\"\$PATH:\$HOME/.pub-cache/bin\""
+      echo ""
+      echo "Try running:"
+      echo "  dynbox --version"
+      echo "  dynbox setup"
+      echo ""
+      exit 0
+    fi
+  fi
+
   echo "❌ Error: Failed to download release manifest from $MANIFEST_URL."
-  echo "Please check your network connection or verify that the release exists."
+  echo "Please check your network connection or verify that a GitHub release exists at:"
+  echo "  https://github.com/juwelzan/dynbox/releases"
+  echo ""
+  echo "To install from source:"
+  echo "  git clone https://github.com/juwelzan/dynbox.git"
+  echo "  cd dynbox/cli/dynbox && dart pub global activate --source path ."
   exit 1
 fi
 

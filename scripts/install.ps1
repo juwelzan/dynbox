@@ -53,6 +53,27 @@ try {
     try {
         Invoke-WebRequest -Uri $ManifestUrl -OutFile $ManifestFile -UseBasicParsing
     } catch {
+        Write-Host "⚠️  Note: Precompiled binary release not found at $ManifestUrl" -ForegroundColor Yellow
+        Write-Host "Attempting to install DynBox directly using Dart toolchain..." -ForegroundColor Cyan
+        
+        $DartCmd = Get-Command "dart" -ErrorAction SilentlyContinue
+        if ($DartCmd) {
+            Write-Host "Found Dart SDK. Activating DynBox from official repository..." -ForegroundColor Green
+            dart pub global activate --source git https://github.com/juwelzan/dynbox.git --git-path cli/dynbox
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host ""
+                Write-Host "==========================================================" -ForegroundColor Green
+                Write-Host "🎉 DynBox was successfully installed via Dart Pub!" -ForegroundColor Green
+                Write-Host "==========================================================" -ForegroundColor Green
+                Write-Host ""
+                Write-Host "Ensure your User PATH includes %LOCALAPPDATA%\Pub\Cache\bin" -ForegroundColor Yellow
+                Write-Host "Try running:" -ForegroundColor Cyan
+                Write-Host "  dynbox --version"
+                Write-Host "  dynbox setup"
+                exit 0
+            }
+        }
+
         Write-Host ""
         Write-Host "❌ Error: Could not download release metadata from $ManifestUrl." -ForegroundColor Red
         Write-Host ""
