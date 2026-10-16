@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "INVALID-NAME-WITH-CAPS!",
+    "kind": "unknown_framework"
+  },
+  "backend": {
+    "provider": "unsupported_cloud"
+  }
+}

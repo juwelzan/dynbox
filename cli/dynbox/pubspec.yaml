@@ -1,0 +1,15 @@
+name: dynbox
+description: Developer-owned Flutter project orchestration platform CLI.
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  args: ^2.7.0
+  crypto: ^3.0.7
+  yaml: ^3.1.4
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

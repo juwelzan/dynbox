@@ -1,0 +1,16 @@
+name: dynbox_ota
+description: First-party DynBox OTA client SDK, update service, and secure configuration delivery engine.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  crypto: ^3.0.7
+  dynbox_ui_runtime:
+    path: ../dynbox_ui_runtime
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dynbox.dev/schemas/v1/dynamic_ui.json",
+  "title": "DynBoxDynamicUiDocument",
+  "description": "Declarative, constrained, schema-driven Dynamic UI specification for DynBox runtime.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "configId",
+    "revision",
+    "screens"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Dynamic UI Schema version. Must be 1 for v1 specifications."
+    },
+    "configId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Unique configuration bundle identifier."
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonically increasing configuration revision integer."
+    },
+    "minAppVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "Optional minimum compatible app semver string."
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primaryColor": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+        },
+        "backgroundColor": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+        },
+        "textColor": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "string",
+        "pattern": "^/[a-zA-Z0-9_/-]*$"
+      }
+    },
+    "featureFlags": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "screens": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 20,
+      "additionalProperties": {
+        "$ref": "#/$defs/screen"
+      }
+    }
+  },
+  "$defs": {
+    "screen": {
+      "type": "object",
+      "required": [
+        "title",
+        "root"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "root": {
+          "$ref": "#/$defs/component"
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "container",
+            "row",
+            "column",
+            "padding",
+            "image",
+            "icon",
+            "button",
+            "sized_box",
+            "card",
+            "divider",
+            "visibility"
+          ]
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "visibleIf": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Feature flag key that determines visibility."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "text": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "fontSize": {
+              "type": "number",
+              "minimum": 6,
+              "maximum": 96
+            },
+            "fontWeight": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "bold",
+                "w100",
+                "w300",
+                "w400",
+                "w500",
+                "w600",
+                "w700",
+                "w900"
+              ]
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+            },
+            "backgroundColor": {
+              "type": "string",
+              "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+            },
+            "padding": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 128
+            },
+            "margin": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 128
+            },
+            "width": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2048
+            },
+            "height": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2048
+            },
+            "borderRadius": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 64
+            },
+            "elevation": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 24
+            },
+            "imageUrl": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://[a-zA-Z0-9._~:/?#\\[\\]@!$&'()*+,;=-]+$"
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "home",
+                "settings",
+                "info",
+                "person",
+                "star",
+                "check",
+                "close",
+                "refresh",
+                "arrow_forward",
+                "arrow_back"
+              ]
+            },
+            "action": {
+              "$ref": "#/$defs/action"
+            },
+            "animation": {
+              "$ref": "#/$defs/animation"
+            }
+          }
+        },
+        "child": {
+          "$ref": "#/$defs/component"
+        },
+        "children": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "navigate",
+            "show_dialog",
+            "open_url",
+            "toggle_flag"
+          ]
+        },
+        "route": {
+          "type": "string",
+          "pattern": "^/[a-zA-Z0-9_/-]*$"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://.+"
+        },
+        "dialogTitle": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "dialogMessage": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "flagKey": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "animation": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "fade_in",
+            "slide_up",
+            "scale"
+          ]
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 2000
+        },
+        "curve": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "easeIn",
+            "easeOut",
+            "easeInOut"
+          ]
+        }
+      }
+    }
+  }
+}

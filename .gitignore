@@ -1,0 +1,38 @@
+# Mac / macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Dart & Flutter
+.dart_tool/
+.packages
+build/
+.pub/
+pubspec.lock
+
+# IDE & Editors
+.idea/
+*.iml
+.vscode/
+
+# DynBox local configs & caches
+.dynbox/
+*.local.yaml
+*.local.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Signing credentials & keystores
+key.properties
+**/key.properties
+*.jks
+*.keystore
+*.p12
+*.cer
+*.mobileprovision
+
+# Logs
+*.log

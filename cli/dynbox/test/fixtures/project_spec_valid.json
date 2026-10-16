@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "sample_mobile_app",
+    "description": "A demonstration mobile Flutter application managed by DynBox",
+    "kind": "flutter_app"
+  },
+  "sdk": {
+    "flutter": {
+      "source": "local",
+      "path": "/opt/flutter",
+      "versionConstraint": ">=3.24.0"
+    }
+  },
+  "platforms": {
+    "android": {
+      "applicationId": "com.example.sampleapp",
+      "minSdkVersion": 21,
+      "targetSdkVersion": 34
+    },
+    "ios": {
+      "bundleIdentifier": "com.example.sampleapp",
+      "minimumDeploymentTarget": "13.0"
+    }
+  },
+  "backend": {
+    "provider": "firebase",
+    "firebase": {
+      "projectId": "demo-dynbox-project"
+    }
+  }
+}

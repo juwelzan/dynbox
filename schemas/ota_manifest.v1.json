@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dynbox.dev/schemas/ota_manifest.v1.json",
+  "title": "DynBox OTA Release Manifest",
+  "description": "Versioned manifest describing an over-the-air configuration release for a DynBox Flutter application.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "appId",
+    "releaseId",
+    "version",
+    "channel",
+    "platform",
+    "minAppVersion",
+    "runtimeSchemaVersion",
+    "payloadSha256",
+    "payloadSizeBytes",
+    "publishedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "OTA manifest specification schema version."
+    },
+    "appId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+$",
+      "description": "Unique identifier of the application (e.g. com.example.myapp)."
+    },
+    "releaseId": {
+      "type": "string",
+      "description": "Unique identifier for this release deployment."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonically increasing configuration revision number."
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["development", "staging", "production"],
+      "description": "Deployment release channel."
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["all", "android", "ios", "macos", "linux", "windows", "web"],
+      "description": "Target OS platform or 'all' for cross-platform configurations."
+    },
+    "minAppVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+.*$",
+      "description": "Minimum binary app version required to apply this configuration."
+    },
+    "runtimeSchemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Required Dynamic UI schema version."
+    },
+    "payloadUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Remote HTTPS URL to fetch the configuration payload from."
+    },
+    "payloadJson": {
+      "type": "string",
+      "description": "Embedded configuration payload string (for direct or mock distributions)."
+    },
+    "payloadSha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "description": "Cryptographic SHA-256 digest of the configuration payload."
+    },
+    "payloadSizeBytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 524288,
+      "description": "Size in bytes of the configuration payload (maximum 512 KB)."
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when this release manifest was published."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional expiration timestamp after which the release is considered obsolete."
+    },
+    "keyId": {
+      "type": "string",
+      "description": "Identifier of the public signing key used to sign the manifest."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Cryptographic signature verifying manifest integrity."
+    }
+  },
+  "additionalProperties": false
+}

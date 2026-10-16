@@ -1,0 +1,10 @@
+name: dynbox_ui_runtime
+description: Schema-driven Dynamic UI runtime, allowlisted widget parser, and OTA update engine for DynBox.
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.4
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

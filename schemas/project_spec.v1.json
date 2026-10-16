@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dynbox.dev/schemas/v1/project_spec.json",
+  "title": "DynBoxProjectSpec",
+  "description": "Declarative project specification schema for DynBox managed Flutter workspaces and projects.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "project",
+    "sdk"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "description": "Semantic schema version integer. Must be 1 for v1 specifications.",
+      "type": "integer",
+      "const": 1
+    },
+    "project": {
+      "description": "General project metadata and kind.",
+      "type": "object",
+      "required": [
+        "name",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Name of the project. Must adhere to valid Dart package and directory naming rules.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "description": {
+          "description": "Human-readable description of the project.",
+          "type": "string"
+        },
+        "kind": {
+          "description": "The category of the DynBox managed project.",
+          "type": "string",
+          "enum": [
+            "flutter_app",
+            "flutter_package",
+            "flutter_plugin"
+          ]
+        }
+      }
+    },
+    "sdk": {
+      "description": "Explicit Flutter SDK selection and pinning configuration.",
+      "type": "object",
+      "required": [
+        "flutter"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "flutter": {
+          "description": "Flutter SDK specification.",
+          "type": "object",
+          "required": [
+            "source"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "description": "Origin of the Flutter SDK. 'local' for developer-specified directory path.",
+              "type": "string",
+              "enum": [
+                "local"
+              ]
+            },
+            "path": {
+              "description": "Filesystem path to the Flutter SDK directory. Relative paths resolve against the workspace root.",
+              "type": "string",
+              "minLength": 1
+            },
+            "versionConstraint": {
+              "description": "Optional semver constraint for required Flutter release (e.g. '>=3.24.0 <4.0.0').",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "platforms": {
+      "description": "Optional target platform settings.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "android": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)+$"
+            },
+            "minSdkVersion": {
+              "type": "integer",
+              "minimum": 21
+            },
+            "targetSdkVersion": {
+              "type": "integer",
+              "minimum": 21
+            }
+          }
+        },
+        "ios": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "bundleIdentifier": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9\\.\\-]+$"
+            },
+            "minimumDeploymentTarget": {
+              "type": "string"
+            }
+          }
+        },
+        "web": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "baseHref": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "backend": {
+      "description": "Optional backend provider integration configuration. Credentials, private keys, or passwords must never be stored here.",
+      "type": "object",
+      "required": [
+        "provider"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "description": "Selected backend provider adapter.",
+          "type": "string",
+          "enum": [
+            "none",
+            "firebase",
+            "supabase"
+          ]
+        },
+        "firebase": {
+          "description": "Non-sensitive public Firebase client configuration identifiers.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "projectId": {
+              "type": "string"
+            }
+          }
+        },
+        "supabase": {
+          "description": "Non-sensitive public Supabase client configuration identifiers.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "projectUrl": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}
