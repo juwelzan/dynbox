@@ -182,28 +182,31 @@ void main() {
       },
     );
 
-    test('dynbox ota publish to production requires explicit --confirm flag', () async {
-      final runner = DynboxRunner();
-      await runner.run([
-        'ota',
-        'init',
-        tempDir.path,
-        '--channel',
-        'production',
-      ]);
+    test(
+      'dynbox ota publish to production requires explicit --confirm flag',
+      () async {
+        final runner = DynboxRunner();
+        await runner.run([
+          'ota',
+          'init',
+          tempDir.path,
+          '--channel',
+          'production',
+        ]);
 
-      final payloadFile = File('${tempDir.path}/ui.json');
-      payloadFile.writeAsStringSync('{"schemaVersion":1,"screens":{}}');
+        final payloadFile = File('${tempDir.path}/ui.json');
+        payloadFile.writeAsStringSync('{"schemaVersion":1,"screens":{}}');
 
-      final exitCode = await runner.run([
-        'ota',
-        'publish',
-        tempDir.path,
-        '--payload',
-        payloadFile.path,
-      ]);
-      expect(exitCode, equals(1));
-    });
+        final exitCode = await runner.run([
+          'ota',
+          'publish',
+          tempDir.path,
+          '--payload',
+          payloadFile.path,
+        ]);
+        expect(exitCode, equals(1));
+      },
+    );
 
     test('dynbox ota sync-source creates valid secret-free snapshot', () async {
       final runner = DynboxRunner();
@@ -240,7 +243,8 @@ void main() {
       expect(exitCode, equals(0));
       expect(outSnapshot.existsSync(), isTrue);
 
-      final snapshotData = jsonDecode(outSnapshot.readAsStringSync()) as Map<String, dynamic>;
+      final snapshotData =
+          jsonDecode(outSnapshot.readAsStringSync()) as Map<String, dynamic>;
       expect(snapshotData['schemaVersion'], equals('1.0'));
       expect(snapshotData['files'], isNotNull);
 
@@ -252,4 +256,3 @@ void main() {
     });
   });
 }
-

@@ -37,11 +37,65 @@ irm https://raw.githubusercontent.com/juwelzan/dynbox/master/scripts/install.ps1
   ```bash
   export PATH="$PATH:$HOME/.dynbox/bin"
   ```
-- **Verification**:
+- **Verification & First-Time Setup**:
   ```bash
   dynbox --version
+  dynbox setup
   dynbox doctor
   ```
+
+---
+
+## First-Time Environment Setup (`dynbox setup`)
+
+On a new machine where Flutter is not yet configured, run the interactive guided setup:
+
+```bash
+dynbox setup
+```
+
+This will:
+1. Detect if a valid Flutter SDK is already configured.
+2. If missing, fetch official release metadata and offer to download and verify the latest official stable Flutter SDK.
+3. Verify downloaded archives using official SHA-256 integrity checksums.
+4. Extract safely to `~/.dynbox/sdks/<version>` without touching PATH or ambient software.
+5. Set the installed managed SDK as your persistent global default.
+6. Report platform build prerequisites (Android JDK, Android SDK, and Xcode on macOS).
+
+---
+
+## Official Flutter SDK Management (`dynbox sdk`)
+
+Manage official Flutter SDK installations deterministically:
+
+```bash
+# List available official releases for your host OS/architecture
+dynbox sdk list
+
+# List locally installed managed Flutter SDKs
+dynbox sdk list-installed
+
+# Download, verify, and install official stable Flutter SDK
+dynbox sdk install stable
+
+# Install a specific pinned version (e.g. 3.47.7)
+dynbox sdk install 3.47.7
+
+# Inspect the active Flutter SDK
+dynbox sdk current
+
+# Switch the global default SDK to an installed version
+dynbox sdk use 3.47.7
+
+# Remove an installed managed SDK (with confirmation)
+dynbox sdk remove 3.47.7
+```
+
+Managed SDKs are stored safely in:
+- macOS & Linux: `~/.dynbox/sdks/<version>`
+- Windows: `%LOCALAPPDATA%\DynBox\sdks\<version>`
+
+---
 
 ### Upgrading DynBox
 Check for updates or perform an atomic in-place upgrade with automatic rollback on failure:

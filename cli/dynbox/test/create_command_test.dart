@@ -296,12 +296,21 @@ void main() {
         expect(configContent, contains('channel: production'));
 
         // Verify DynBox First-Party OTA integration in generated app
-        expect(File('${projectDir.path}/lib/dynbox_ota_service.dart').existsSync(), isTrue);
-        expect(File('${projectDir.path}/lib/dynbox_ota_demo_screen.dart').existsSync(), isTrue);
-        final mainDart = File('${projectDir.path}/lib/main.dart').readAsStringSync();
+        expect(
+          File('${projectDir.path}/lib/dynbox_ota_service.dart').existsSync(),
+          isTrue,
+        );
+        expect(
+          File('${projectDir.path}/lib/dynbox_ota_demo_screen.dart')
+              .existsSync(),
+          isTrue,
+        );
+        final mainDart = File('${projectDir.path}/lib/main.dart')
+            .readAsStringSync();
         expect(mainDart, contains('AppOtaCoordinator.initialize'));
         expect(mainDart, contains('DynboxOtaDemoScreen'));
-        final pubspecContent = File('${projectDir.path}/pubspec.yaml').readAsStringSync();
+        final pubspecContent = File('${projectDir.path}/pubspec.yaml')
+            .readAsStringSync();
         expect(pubspecContent, contains('dynbox_ota:'));
         expect(pubspecContent, contains('dynbox_ui_runtime:'));
       },

@@ -167,7 +167,40 @@ This document outlines the planned evolutionary phases for the DynBox platform. 
   - `dynbox ota validate <manifest-or-payload-path>`
   - `dynbox ota sync-source [project-path]`
   - `dynbox ota publish <project-path> --payload <file> --confirm [--supabase-service-key <key>]`
-- [x] Complete automated test suite: 17 tests in `packages/dynbox_ota`, 15 in `packages/dynbox_ui_runtime`, 108 in `cli/dynbox` (all passing, 0 analyzer issues).
+- [x] Complete automated test suite: 17 tests in `packages/dynbox_ota`, 15 in `packages/dynbox_ui_runtime`, 122 in `cli/dynbox` (all passing, 0 analyzer issues).
+
+---
+
+## Phase 8: Official Flutter SDK Manager & First-Time Setup
+*Status: Completed*
+
+### Objectives
+- Enable DynBox on clean machines without pre-installed Flutter or Dart.
+- Provide a secure, official Flutter SDK download, verification, extraction, and management system.
+- Streamline first-time developer onboarding via a guided `dynbox setup` experience.
+
+### Delivered Capabilities
+- [x] Official Flutter Release Manifest Catalog parser fetching and caching `https://storage.googleapis.com/flutter_infra_release/releases/releases_<os>.json`.
+- [x] Architecture detection mapping host OS and CPU architecture (macOS x64/arm64, Linux x64/arm64, Windows x64/arm64).
+- [x] Cryptographic verification: calculates SHA-256 digests of downloaded archives and verifies against official Google Cloud release metadata.
+- [x] Safe extraction & path traversal defense: rejects archives containing directory traversal (`../`) or absolute paths; extracts atomically via `SafeProcessExecutor` (`unzip` on macOS/Linux, `tar` on Windows) into isolated staging directories.
+- [x] Sandboxed directory management: managed SDKs reside strictly in user-owned `~/.dynbox/sdks/<version>` (`%LOCALAPPDATA%\DynBox\sdks\<version>` on Windows). Never deletes directories outside managed root.
+- [x] Safe removal with explicit confirmation (`--yes` required in non-interactive CLI).
+- [x] CLI `dynbox sdk` subcommands:
+  - `dynbox sdk list`: Lists available official Flutter versions from Google Cloud release manifest.
+  - `dynbox sdk list-installed`: Lists currently downloaded/managed SDKs.
+  - `dynbox sdk install <version|stable>`: Downloads, verifies, and installs official Flutter SDK.
+  - `dynbox sdk use <version>`: Sets installed managed SDK as global default in `~/.dynbox/config.yaml`.
+  - `dynbox sdk current`: Displays currently active/pinned Flutter SDK and resolution source.
+  - `dynbox sdk remove <version>`: Removes managed SDK directory with confirmation.
+- [x] Guided First-Time Setup (`dynbox setup`):
+  - Detects if a valid Flutter SDK is already configured.
+  - Inspects host toolchain prerequisites (Android SDK, Xcode, CocoaPods) with clear diagnostic output.
+  - Prompts and installs official stable Flutter SDK if missing.
+  - Configures global default in `~/.dynbox/config.yaml` upon successful validation.
+- [x] Preserved precedence order: CLI flag (`--flutter-root`) > Workspace config (`.dynbox/config.yaml`) > Global config (`~/.dynbox/config.yaml`) > Environment variable (`DYNBOX_FLUTTER_ROOT`). Strictly zero ambient `$PATH` fallback.
+- [x] Updated `dynbox doctor` and `dynbox create` with clear diagnostics recommending `dynbox setup` when no SDK is configured.
+- [x] Comprehensive test suite in `cli/dynbox/test/sdk_manager_test.dart` (122 tests passing across `cli/dynbox`, 0 analyzer issues).
 
 ---
 

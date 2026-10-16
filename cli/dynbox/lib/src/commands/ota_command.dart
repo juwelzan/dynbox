@@ -96,7 +96,8 @@ class OtaSyncSourceCommand extends Command<int> {
     stdout.writeln('  Snapshot Digest: ${manifest['snapshotSha256']}');
     stdout.writeln('  Total Source Size: ${manifest['totalSizeBytes']} bytes');
 
-    final outputPath = argResults?['output'] as String? ??
+    final outputPath =
+        argResults?['output'] as String? ??
         '${projectDir.path}/build/source_snapshot.json';
     final outFile = File(outputPath);
     outFile.parent.createSync(recursive: true);
@@ -111,7 +112,6 @@ class OtaSyncSourceCommand extends Command<int> {
     return 0;
   }
 }
-
 
 /// Subcommand `dynbox ota status [project-path]`.
 class OtaStatusCommand extends Command<int> {
@@ -529,15 +529,21 @@ class OtaPublishCommand extends Command<int> {
 
     // Explicit confirmation guard for production updates
     if (channel == 'production' && !isConfirmed) {
-      stderr.writeln('Safety Warning: You are attempting to publish an OTA update to the "production" channel.');
+      stderr.writeln(
+        'Safety Warning: You are attempting to publish an OTA update to the "production" channel.',
+      );
       stderr.writeln('This update will be activated by live client apps.');
-      stderr.writeln('To proceed, pass the explicit confirmation flag: --confirm');
+      stderr.writeln(
+        'To proceed, pass the explicit confirmation flag: --confirm',
+      );
       return 1;
     }
 
     final payloadBytes = payloadFile.readAsBytesSync();
     if (payloadBytes.length > 524288) {
-      stderr.writeln('Error: Payload exceeds maximum allowable OTA size (512 KB). Current size: ${payloadBytes.length} bytes.');
+      stderr.writeln(
+        'Error: Payload exceeds maximum allowable OTA size (512 KB). Current size: ${payloadBytes.length} bytes.',
+      );
       return 1;
     }
 
@@ -552,7 +558,8 @@ class OtaPublishCommand extends Command<int> {
 
     // Check if Supabase backend is configured
     final isSupabase = config.backend.provider == BackendProviderKind.supabase;
-    final supabaseUrl = config.backend.providerConfig['supabase']?['projectUrl'] as String?;
+    final supabaseUrl =
+        config.backend.providerConfig['supabase']?['projectUrl'] as String?;
 
     if (config.ota.serverUrl == null && !isSupabase) {
       stdout.writeln(
@@ -580,13 +587,20 @@ class OtaPublishCommand extends Command<int> {
     }
 
     if (isSupabase) {
-      final serviceKey = (argResults?['supabase-service-key'] as String?) ??
+      final serviceKey =
+          (argResults?['supabase-service-key'] as String?) ??
           Platform.environment['DYNBOX_SUPABASE_SERVICE_KEY'];
 
       if (serviceKey == null || serviceKey.trim().isEmpty) {
-        stderr.writeln('Error: Publishing to Supabase requires an authorized service-role key.');
-        stderr.writeln('Provide it via --supabase-service-key or DYNBOX_SUPABASE_SERVICE_KEY env var.');
-        stderr.writeln('Note: Client apps only use public anon keys. Service keys are strictly for publishing.');
+        stderr.writeln(
+          'Error: Publishing to Supabase requires an authorized service-role key.',
+        );
+        stderr.writeln(
+          'Provide it via --supabase-service-key or DYNBOX_SUPABASE_SERVICE_KEY env var.',
+        );
+        stderr.writeln(
+          'Note: Client apps only use public anon keys. Service keys are strictly for publishing.',
+        );
         return 1;
       }
 
@@ -602,12 +616,15 @@ class OtaPublishCommand extends Command<int> {
         scheme: baseUri.scheme,
         host: baseUri.host,
         port: baseUri.hasPort ? baseUri.port : null,
-        path: '${baseUri.path.replaceAll(RegExp(r'/+$'), '')}/rest/v1/ota_releases',
+        path:
+            '${baseUri.path.replaceAll(RegExp(r'/+$'), '')}/rest/v1/ota_releases',
       );
 
       final client = HttpClient();
       try {
-        final req = await client.postUrl(insertUri).timeout(const Duration(seconds: 10));
+        final req = await client
+            .postUrl(insertUri)
+            .timeout(const Duration(seconds: 10));
         req.headers.set('apikey', serviceKey);
         req.headers.set('Authorization', 'Bearer $serviceKey');
         req.headers.set('Content-Type', 'application/json');
@@ -637,11 +654,15 @@ class OtaPublishCommand extends Command<int> {
         final res = await req.close().timeout(const Duration(seconds: 10));
 
         if (res.statusCode == 201) {
-          stdout.writeln('✓ Successfully published release "$releaseId" to Supabase ota_releases table!');
+          stdout.writeln(
+            '✓ Successfully published release "$releaseId" to Supabase ota_releases table!',
+          );
           return 0;
         } else {
           final errBody = await res.transform(const Utf8Decoder()).join();
-          stderr.writeln('✗ Supabase returned error (HTTP ${res.statusCode}): $errBody');
+          stderr.writeln(
+            '✗ Supabase returned error (HTTP ${res.statusCode}): $errBody',
+          );
           return 1;
         }
       } catch (e) {

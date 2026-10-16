@@ -83,7 +83,8 @@ class SourceArchiver {
       final fileName = segments.last.toLowerCase();
 
       // Check forbidden file names
-      if (forbiddenFileNames.contains(fileName) || fileName.startsWith('.env')) {
+      if (forbiddenFileNames.contains(fileName) ||
+          fileName.startsWith('.env')) {
         continue;
       }
 
@@ -119,10 +120,7 @@ class SourceArchiver {
       final bytes = file.readAsBytesSync();
       totalBytes += bytes.length;
       final fileSha = crypto.sha256.convert(bytes).toString();
-      fileManifest[relPath] = {
-        'sizeBytes': bytes.length,
-        'sha256': fileSha,
-      };
+      fileManifest[relPath] = {'sizeBytes': bytes.length, 'sha256': fileSha};
     }
 
     final manifestBytes = utf8.encode(jsonEncode(fileManifest));

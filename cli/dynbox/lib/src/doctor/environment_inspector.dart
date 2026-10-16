@@ -95,7 +95,7 @@ class EnvironmentInspector {
           title: 'DynBox Flutter SDK Configuration',
           status: CheckStatus.warning,
           details: 'No explicit Flutter SDK configured. (DynBox requires an explicit SDK path and will not silently pick a random one from PATH).',
-          remedy: 'Configure via "dynbox config set flutter-root <path>", --flutter-root <path>, DYNBOX_FLUTTER_ROOT environment variable, or .dynbox/config.yaml.',
+          remedy: 'Run "dynbox setup" for automatic official installation, or "dynbox config set flutter-root <path>".',
         ),
       );
     } else {
@@ -104,12 +104,15 @@ class EnvironmentInspector {
         final versionInfo = validation.flutterVersion != null
             ? ' (Version: ${validation.flutterVersion})'
             : '';
+        final dartInfo = validation.dartVersion != null
+            ? ' - Bundled Dart: ${validation.dartVersion}'
+            : '';
         items.add(
           CheckItem(
             title: 'DynBox Flutter SDK Configuration',
             status: CheckStatus.pass,
             details:
-                'Configured via ${sdkConfig.source}: ${sdkConfig.flutterSdkPath}$versionInfo\n'
+                'Configured via ${sdkConfig.source}: ${sdkConfig.flutterSdkPath}$versionInfo$dartInfo\n'
                 '    Executable: ${validation.flutterExecutablePath}',
           ),
         );
@@ -121,12 +124,65 @@ class EnvironmentInspector {
             details:
                 'Configured path via ${sdkConfig.source} is invalid: "${sdkConfig.flutterSdkPath}".\n'
                 '    Reason: ${validation.message}',
-            remedy: 'Provide a valid path to an official Flutter SDK directory containing bin/flutter.',
+            remedy: 'Run "dynbox setup" or provide a valid path containing bin/flutter.',
           ),
         );
       }
     }
 
+    // 5. Host Platform Build Prerequisites (Informational)
+    _inspectPlatformPrerequisites(items);
+
     return DoctorReport(items);
+  }
+
+  void _inspectPlatformPrerequisites(List<CheckItem> items) {
+    // Java / Android
+    var javaOk = false;
+    try {
+      final res = Process.runSync('java', ['-version']);
+      javaOk = res.exitCode == 0;
+    } catch (_) {}
+
+    final androidHome =
+        environment['ANDROID_HOME'] ?? environment['ANDROID_SDK_ROOT'];
+    final hasAndroidSdk =
+        androidHome != null && Directory(androidHome).existsSync();
+
+    items.add(
+      CheckItem(
+        title: 'Android Toolchain (Prerequisite for Android builds)',
+        status: (javaOk && hasAndroidSdk)
+            ? CheckStatus.pass
+            : CheckStatus.warning,
+        details:
+            'JDK: ${javaOk ? "Detected" : "Not found in PATH"} | Android SDK: ${hasAndroidSdk ? androidHome : "Not detected"}',
+        remedy: (!javaOk || !hasAndroidSdk)
+            ? 'Install Android Studio and ensure JDK & ANDROID_HOME are set.'
+            : null,
+      ),
+    );
+
+    // iOS (macOS only)
+    if (Platform.isMacOS) {
+      var xcodeOk = false;
+      try {
+        final res = Process.runSync('xcodebuild', ['-version']);
+        xcodeOk = res.exitCode == 0;
+      } catch (_) {}
+
+      items.add(
+        CheckItem(
+          title: 'iOS Toolchain (Prerequisite for iOS builds)',
+          status: xcodeOk ? CheckStatus.pass : CheckStatus.warning,
+          details: xcodeOk
+              ? 'Xcode detected'
+              : 'xcodebuild not detected in PATH',
+          remedy: !xcodeOk
+              ? 'Install Xcode from Mac App Store for iOS application development.'
+              : null,
+        ),
+      );
+    }
   }
 }

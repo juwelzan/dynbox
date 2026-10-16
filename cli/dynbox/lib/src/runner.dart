@@ -8,6 +8,8 @@ import 'commands/config_command.dart';
 import 'commands/create_command.dart';
 import 'commands/doctor_command.dart';
 import 'commands/ota_command.dart';
+import 'commands/sdk_command.dart';
+import 'commands/setup_command.dart';
 import 'commands/uninstall_command.dart';
 import 'commands/upgrade_command.dart';
 import 'version.dart';
@@ -26,6 +28,10 @@ class DynboxRunner extends CommandRunner<int> {
     );
 
     addCommand(DoctorCommand());
+    addCommand(
+      SetupCommand(globalConfigFileOverride: globalConfigFileOverride),
+    );
+    addCommand(SdkCommand(globalConfigFileOverride: globalConfigFileOverride));
     addCommand(
       ConfigCommand(globalConfigFileOverride: globalConfigFileOverride),
     );
