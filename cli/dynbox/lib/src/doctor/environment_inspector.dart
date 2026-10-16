@@ -95,7 +95,7 @@ class EnvironmentInspector {
           title: 'DynBox Flutter SDK Configuration',
           status: CheckStatus.warning,
           details: 'No explicit Flutter SDK configured. (DynBox requires an explicit SDK path and will not silently pick a random one from PATH).',
-          remedy: 'Configure via --flutter-root <path>, DYNBOX_FLUTTER_ROOT environment variable, or .dynbox/config.yaml (flutter_sdk_path: ...).',
+          remedy: 'Configure via "dynbox config set flutter-root <path>", --flutter-root <path>, DYNBOX_FLUTTER_ROOT environment variable, or .dynbox/config.yaml.',
         ),
       );
     } else {

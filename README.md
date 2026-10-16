@@ -231,14 +231,39 @@ backend:
 
 ---
 
+## Persistent Global Configuration (`dynbox config`)
+
+To avoid repeatedly passing `--flutter-root` when running commands or creating new projects, configure your default Flutter SDK root once globally:
+
+```bash
+# Set default Flutter SDK root
+dynbox config set flutter-root /path/to/official/flutter
+
+# Read configured SDK root
+dynbox config get flutter-root
+
+# List all persistent configuration settings
+dynbox config list
+
+# Remove persistent setting
+dynbox config unset flutter-root
+```
+
+Global configuration is securely persisted in:
+- macOS & Linux: `~/.dynbox/config.yaml`
+- Windows: `%LOCALAPPDATA%\DynBox\config.yaml`
+
+---
+
 ## SDK Selection Precedence
 
 DynBox strictly requires an explicit SDK path and will **never** silently fall back to an ambient `flutter` executable found on system `$PATH`.
 
 The resolution order is:
 1. **Command Line Flag**: `--flutter-root <path>` (overrides current command without modifying configuration files)
-2. **Workspace Configuration**: `.dynbox/config.yaml` (`sdk.flutter.path`)
-3. **Environment Variable**: `DYNBOX_FLUTTER_ROOT`
+2. **Workspace Configuration**: `.dynbox/config.yaml` (`sdk.flutter.path` or `flutter_sdk_path`)
+3. **Persistent Global Configuration**: `~/.dynbox/config.yaml` (`dynbox config set flutter-root <path>`)
+4. **Environment Variable**: `DYNBOX_FLUTTER_ROOT`
 
 If none of these are present, DynBox aborts with an actionable error.
 

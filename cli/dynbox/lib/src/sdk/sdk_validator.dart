@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../config/dynbox_config.dart';
+import '../config/global_config.dart';
 
 /// Represents the validation result of a configured Flutter SDK path.
 class SdkValidationResult {
@@ -43,7 +44,7 @@ class SdkConfig {
   /// Custom path to Flutter SDK directory or null if not explicitly set.
   final String? flutterSdkPath;
 
-  /// Source of the configuration (e.g., 'cli-argument', 'environment-variable', 'config-file', 'none').
+  /// Source of the configuration (e.g., 'cli-argument', 'workspace-config', 'global-config', 'environment-variable', 'none').
   final String source;
 
   const SdkConfig({this.flutterSdkPath, this.source = 'none'});
@@ -55,11 +56,13 @@ class SdkConfig {
 /// Responsible for resolving and validating Flutter SDK paths explicitly.
 class SdkValidator {
   final Map<String, String> environment;
+  final File? globalConfigOverride;
 
-  const SdkValidator({this.environment = const {}});
+  const SdkValidator({this.environment = const {}, this.globalConfigOverride});
 
   /// Resolves the SDK configuration without silently using PATH Flutter.
   SdkConfig resolveConfig({String? explicitPath, File? configFile}) {
+    // 1. CLI explicit argument
     if (explicitPath != null && explicitPath.trim().isNotEmpty) {
       return SdkConfig(
         flutterSdkPath: explicitPath.trim(),
@@ -67,14 +70,7 @@ class SdkValidator {
       );
     }
 
-    final envPath = environment['DYNBOX_FLUTTER_ROOT'];
-    if (envPath != null && envPath.trim().isNotEmpty) {
-      return SdkConfig(
-        flutterSdkPath: envPath.trim(),
-        source: 'environment-variable (DYNBOX_FLUTTER_ROOT)',
-      );
-    }
-
+    // 2. Workspace configuration (.dynbox/config.yaml)
     if (configFile != null && configFile.existsSync()) {
       try {
         final content = configFile.readAsStringSync();
@@ -103,6 +99,30 @@ class SdkValidator {
       } catch (_) {
         // Ignored or handled as unconfigured
       }
+    }
+
+    // 3. Persistent global DynBox SDK configuration (~/.dynbox/config.yaml)
+    final globalFile =
+        globalConfigOverride ??
+        GlobalConfig.resolveConfigFile(environment: environment);
+    if (globalFile.existsSync()) {
+      final global = GlobalConfig.fromFile(globalFile);
+      if (global.flutterSdkPath != null &&
+          global.flutterSdkPath!.trim().isNotEmpty) {
+        return SdkConfig(
+          flutterSdkPath: global.flutterSdkPath!.trim(),
+          source: 'global-config (${globalFile.path})',
+        );
+      }
+    }
+
+    // 4. Environment variable
+    final envPath = environment['DYNBOX_FLUTTER_ROOT'];
+    if (envPath != null && envPath.trim().isNotEmpty) {
+      return SdkConfig(
+        flutterSdkPath: envPath.trim(),
+        source: 'environment-variable (DYNBOX_FLUTTER_ROOT)',
+      );
     }
 
     return const SdkConfig(flutterSdkPath: null, source: 'none');

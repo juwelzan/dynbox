@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../config/dynbox_config.dart';
+import '../config/global_config.dart';
 import 'sdk_validator.dart';
 
 /// Exception thrown when SDK resolution fails.
@@ -37,18 +38,26 @@ class PinnedSdk {
 /// Resolves the explicit Flutter SDK to use based on strict precedence:
 /// 1. Command-line argument (`--flutter-root`)
 /// 2. Workspace configuration file (`.dynbox/config.yaml`)
-/// 3. Environment variable (`DYNBOX_FLUTTER_ROOT`)
+/// 3. Persistent global DynBox SDK configuration (`~/.dynbox/config.yaml`)
+/// 4. Environment variable (`DYNBOX_FLUTTER_ROOT`)
 ///
 /// NOTE: Ambient system PATH is NEVER used as a fallback.
 class SdkResolver {
   final SdkValidator validator;
   final Map<String, String> environment;
+  final File? globalConfigOverride;
 
-  SdkResolver({SdkValidator? validator, Map<String, String>? environment})
-    : environment = environment ?? Platform.environment,
-      validator =
-          validator ??
-          SdkValidator(environment: environment ?? Platform.environment);
+  SdkResolver({
+    SdkValidator? validator,
+    Map<String, String>? environment,
+    this.globalConfigOverride,
+  }) : environment = environment ?? Platform.environment,
+       validator =
+           validator ??
+           SdkValidator(
+             environment: environment ?? Platform.environment,
+             globalConfigOverride: globalConfigOverride,
+           );
 
   /// Resolves the SDK directory and verified executable.
   PinnedSdk resolve({
@@ -87,7 +96,22 @@ class SdkResolver {
       }
     }
 
-    // 3. Environment variable
+    // 3. Persistent global DynBox SDK configuration (~/.dynbox/config.yaml)
+    if (selectedPath == null) {
+      final globalConfigFile =
+          globalConfigOverride ??
+          GlobalConfig.resolveConfigFile(environment: environment);
+      if (globalConfigFile.existsSync()) {
+        final global = GlobalConfig.fromFile(globalConfigFile);
+        if (global.flutterSdkPath != null &&
+            global.flutterSdkPath!.trim().isNotEmpty) {
+          selectedPath = global.flutterSdkPath!.trim();
+          source = 'global-config (${globalConfigFile.path})';
+        }
+      }
+    }
+
+    // 4. Environment variable
     if (selectedPath == null) {
       final envPath = environment['DYNBOX_FLUTTER_ROOT'];
       if (envPath != null && envPath.trim().isNotEmpty) {
@@ -100,7 +124,7 @@ class SdkResolver {
     if (selectedPath == null || selectedPath.isEmpty) {
       throw const SdkResolutionException(
         'No explicit Flutter SDK configured. DynBox requires an explicit SDK path and will not silently pick a random one from PATH.\n'
-        'Remedy: Specify --flutter-root <path>, define DYNBOX_FLUTTER_ROOT, or configure .dynbox/config.yaml.',
+        'Remedy: Run "dynbox config set flutter-root <path>", specify --flutter-root <path>, define DYNBOX_FLUTTER_ROOT, or configure .dynbox/config.yaml.',
       );
     }
 

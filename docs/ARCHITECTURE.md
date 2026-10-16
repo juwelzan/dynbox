@@ -71,8 +71,9 @@ The command-line interface provides the developer interaction surface:
 A core requirement of DynBox is reproducible and isolated builds:
 - **Explicit Resolution Hierarchy**:
   1. **CLI parameter**: `--flutter-root <path>`
-  2. **Workspace configuration**: `.dynbox/config.yaml` (`sdk.flutter.path`)
-  3. **Environment variable**: `DYNBOX_FLUTTER_ROOT`
+  2. **Workspace configuration**: `.dynbox/config.yaml` (`sdk.flutter.path` or `flutter_sdk_path`)
+  3. **Persistent global configuration**: `~/.dynbox/config.yaml` (`dynbox config set flutter-root <path>`)
+  4. **Environment variable**: `DYNBOX_FLUTTER_ROOT`
 - **No Ambient Fallback**: If an explicit path is omitted across all sources, DynBox refuses to execute project operations against an arbitrary `flutter` found in `$PATH`.
 - **Host OS Path Resolution**: Automatically resolves absolute executable binaries based on the host OS (`bin/flutter` on macOS/Linux, `bin/flutter.bat` on Windows).
 

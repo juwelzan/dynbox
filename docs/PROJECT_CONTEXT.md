@@ -31,7 +31,8 @@ The platform's pillars include:
 1. **Official SDKs**: Only official, unmodified Flutter and Dart SDK releases are used. The platform never forks or modifies the Flutter engine, embedder, or Dart compiler.
 2. **Explicit SDK Selection Precedence**: DynBox strictly invokes explicitly configured SDK paths according to a documented hierarchy:
    - CLI argument (`--flutter-root <path>`)
-   - Workspace configuration (`.dynbox/config.yaml` -> `sdk.flutter.path`)
+   - Workspace configuration (`.dynbox/config.yaml` -> `sdk.flutter.path` or `flutter_sdk_path`)
+   - Persistent global configuration (`~/.dynbox/config.yaml` -> `dynbox config set flutter-root <path>`)
    - Environment variable (`DYNBOX_FLUTTER_ROOT`)
    - *Never* silently falls back to arbitrary ambient `flutter` binaries on system `$PATH`.
 3. **No Hidden Shell Modifications**: DynBox will not edit `PATH`, `.zshrc`, `.bashrc`, or system environment startup files.

@@ -4,6 +4,7 @@ import 'package:args/command_runner.dart';
 
 import 'commands/backend_command.dart';
 import 'commands/build_command.dart';
+import 'commands/config_command.dart';
 import 'commands/create_command.dart';
 import 'commands/doctor_command.dart';
 import 'commands/ota_command.dart';
@@ -12,7 +13,7 @@ import 'commands/upgrade_command.dart';
 import 'version.dart';
 
 class DynboxRunner extends CommandRunner<int> {
-  DynboxRunner()
+  DynboxRunner({File? globalConfigFileOverride})
     : super(
         'dynbox',
         'DynBox — Developer-owned Flutter project orchestration platform.',
@@ -25,6 +26,9 @@ class DynboxRunner extends CommandRunner<int> {
     );
 
     addCommand(DoctorCommand());
+    addCommand(
+      ConfigCommand(globalConfigFileOverride: globalConfigFileOverride),
+    );
     addCommand(CreateCommand());
     addCommand(BackendCommand());
     addCommand(BuildCommand());
