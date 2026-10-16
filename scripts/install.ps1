@@ -50,7 +50,22 @@ try {
     $ManifestFile = Join-Path $TempDir "release_manifest.json"
 
     Write-Host "Fetching release metadata from $ManifestUrl..."
-    Invoke-WebRequest -Uri $ManifestUrl -OutFile $ManifestFile -UseBasicParsing
+    try {
+        Invoke-WebRequest -Uri $ManifestUrl -OutFile $ManifestFile -UseBasicParsing
+    } catch {
+        Write-Host ""
+        Write-Host "❌ Error: Could not download release metadata from $ManifestUrl." -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Possible causes:" -ForegroundColor Yellow
+        Write-Host "  1. No published release exists yet on GitHub (https://github.com/juwelzan/dynbox/releases)." -ForegroundColor Yellow
+        Write-Host "  2. Network connection or proxy issue." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Alternative setup options:" -ForegroundColor Cyan
+        Write-Host "  • If Dart is installed, run directly:" -ForegroundColor Cyan
+        Write-Host "      dart pub global activate --source git https://github.com/juwelzan/dynbox.git --git-path cli/dynbox" -ForegroundColor White
+        Write-Host ""
+        exit 1
+    }
 
     $Manifest = Get-Content -Raw -Path $ManifestFile | ConvertFrom-Json
     $ResolvedVersion = $Manifest.version
